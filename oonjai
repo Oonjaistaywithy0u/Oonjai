@@ -1,0 +1,231 @@
+index.html
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Oonjai | แบบทดสอบสุขภาพจิตนักเรียน</title>
+
+<style>
+body{
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    background:#f2f7fa;
+    margin:0;
+    padding:0;
+}
+.container{
+    max-width:900px;
+    margin:30px auto;
+    background:#ffffff;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 6px 15px rgba(0,0,0,0.1);
+}
+h1{
+    text-align:center;
+    color:#4aa3c7;
+}
+.desc{
+    background:#eef7fb;
+    padding:20px;
+    border-radius:10px;
+    margin-bottom:30px;
+    line-height:1.7;
+}
+.question{
+    margin-bottom:30px;
+}
+.options{
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
+}
+.option{
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    cursor:pointer;
+    border:3px solid transparent;
+    transition:0.2s;
+}
+.option:hover{
+    transform:scale(1.1);
+}
+.selected{
+    border:3px solid #000;
+}
+.blue{background:#5bc0eb;}
+.green{background:#6cc070;}
+.yellow{background:#f7d046;}
+.orange{background:#f39c12;}
+.red{background:#e74c3c;}
+
+.legend{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    margin-top:8px;
+    color:#555;
+}
+
+button{
+    display:block;
+    margin:30px auto;
+    padding:15px 40px;
+    font-size:18px;
+    background:#4aa3c7;
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+}
+button:hover{
+    background:#3b8fb1;
+}
+
+#result{
+    display:none;
+    padding:25px;
+    border-radius:12px;
+    margin-top:30px;
+    background:#eef7fb;
+}
+
+textarea{
+    width:100%;
+    height:130px;
+    margin-top:10px;
+    padding:12px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    font-size:14px;
+}
+
+.footer{
+    font-size:13px;
+    color:#777;
+    margin-top:30px;
+    text-align:center;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>🌱 Oonjai</h1>
+
+<div class="desc">
+<strong>แบบทดสอบสุขภาพจิตนักเรียน (อายุ 12–19 ปี)</strong><br><br>
+แบบทดสอบนี้มีไว้เพื่อช่วยให้คุณสำรวจสุขภาพจิตของตัวเอง  
+ผลลัพธ์ที่ได้เป็นเพียงแนวทางเบื้องต้น  
+ไม่ได้ตัดสินหรือระบุว่าคุณเป็นแบบใดแบบหนึ่ง  
+
+แต่อยากช่วยให้คุณเข้าใจตัวเอง  
+และใส่ใจจิตใจของตัวเองมากขึ้น 💙  
+
+อุ่นใจขอส่งกำลังใจให้ทุกคน  
+ผ่านช่วงเวลาแย่ ๆ ไปได้นะคะ
+</div>
+
+<form id="quiz"></form>
+
+<button onclick="calculate()">ดูผลการประเมิน</button>
+
+<div id="result"></div>
+
+<h3>📝 เล่าปัญหา หรือขอคำแนะนำ</h3>
+<textarea placeholder="คุณสามารถเล่าความรู้สึก ปัญหา หรือขอคำปรึกษาได้ที่นี่ (ไม่ระบุตัวตน)"></textarea>
+
+<div class="footer">
+📞 หากต้องการความช่วยเหลือ โทรสายด่วนสุขภาพจิต 1323 (24 ชั่วโมง)
+</div>
+
+</div>
+
+<script>
+const questions = [
+"ช่วงนี้คุณรู้สึกสบายใจกับการใช้ชีวิตประจำวัน",
+"คุณสามารถรับมือกับความเครียดจากการเรียนได้",
+"คุณรู้สึกมีพลังใจในการใช้ชีวิตแต่ละวัน",
+"คุณยังรู้สึกสนุกหรือมีความสุขกับบางสิ่งรอบตัวอยู่",
+"ช่วงนี้คุณพักผ่อนเพียงพอ กินอิ่ม นอนหลับ",
+"คุณสามารถควบคุมอารมณ์ของตัวเองได้ค่อนข้างดี",
+"เมื่อเจอปัญหา คุณพยายามหาวิธีแก้ไขมากกว่าหลีกเลี่ยง",
+"คุณรู้สึกว่าตัวเองมีคุณค่า",
+"คุณรู้สึกมั่นใจในความสามารถของตัวเอง",
+"คุณยอมรับข้อผิดพลาดของตัวเองได้",
+"คุณมีสมาธิในการเรียนหรือทำกิจกรรมได้ดี",
+"คุณรู้สึกผ่อนคลายเมื่ออยู่ในโรงเรียน",
+"คุณมีเพื่อนหรือคนรอบตัวที่ทำให้รู้สึกสบายใจ",
+"คุณกล้าแสดงความคิดเห็นของตัวเองอย่างเหมาะสม",
+"คุณกล้าขอความช่วยเหลือจากเพื่อนเสมอไม่ว่าเรื่องอะไร",
+"คุณรู้สึกว่าได้รับกำลังใจจากคนรอบข้าง",
+"คุณสามารถจัดสรรเวลาเรียนและเวลาพักผ่อนได้",
+"คุณไม่กดดันตัวเองเลย",
+"คุณรู้สึกภูมิใจกับความพยายามของตัวเอง",
+"คุณมองว่าปัญหาเป็นสิ่งที่เรียนรู้ได้",
+"คุณสามารถปรับตัวกับการเปลี่ยนแปลงต่าง ๆ ได้ดี",
+"คุณรู้สึกว่าตัวเองเป็นส่วนหนึ่งของสังคม",
+"คุณมีวิธีผ่อนคลายความเครียดที่เหมาะสม",
+"คุณยังมีเป้าหมายหรือความฝันในอนาคต",
+"คุณรู้สึกปลอดภัยในการแสดงความรู้สึกของตัวเอง",
+"คุณสามารถให้อภัยตัวเองเมื่อทำผิดพลาด",
+"คุณรู้สึกดีกับความสัมพันธ์ในครอบครัว",
+"คุณไม่เปรียบเทียบตัวเองกับคนอื่น",
+"คุณรู้สึกว่าชีวิตประจำวันของคุณมีความสมดุล",
+"คุณรู้สึกว่าสุขภาพจิตของคุณดี"
+];
+
+const quiz = document.getElementById("quiz");
+let scores = Array(questions.length).fill(0);
+
+questions.forEach((q,i)=>{
+    quiz.innerHTML += `
+    <div class="question">
+        <strong>${i+1}. ${q}</strong>
+        <div class="options">
+            <div class="option blue" onclick="select(this,5,${i})"></div>
+            <div class="option green" onclick="select(this,4,${i})"></div>
+            <div class="option yellow" onclick="select(this,3,${i})"></div>
+            <div class="option orange" onclick="select(this,2,${i})"></div>
+            <div class="option red" onclick="select(this,1,${i})"></div>
+        </div>
+        <div class="legend">
+            <span>มากที่สุด</span>
+            <span>ค่อนข้างมาก</span>
+            <span>ปานกลาง</span>
+            <span>น้อย</span>
+            <span>ไม่เลย</span>
+        </div>
+    </div>`;
+});
+
+function select(el,score,index){
+    const parent = el.parentElement;
+    [...parent.children].forEach(c=>c.classList.remove("selected"));
+    el.classList.add("selected");
+    scores[index]=score;
+}
+
+function calculate(){
+    const total = scores.reduce((a,b)=>a+b,0);
+    let message = "";
+
+    if(total >= 120){
+        message = "💙 สุขภาพจิตของคุณอยู่ในระดับดี คุณสามารถจัดการอารมณ์ ความเครียด และการใช้ชีวิตประจำวันได้ค่อนข้างดี อย่าลืมดูแลจิตใจของตัวเองให้ดีต่อไปนะคะ";
+    }else if(total >= 90){
+        message = "💚 สุขภาพจิตอยู่ในระดับค่อนข้างดี อาจมีบางช่วงที่เหนื่อยหรือกดดัน ลองพักผ่อนและพูดคุยกับคนที่ไว้ใจนะคะ";
+    }else if(total >= 60){
+        message = "💛 สุขภาพจิตอยู่ในระดับปานกลาง คุณอาจกำลังเผชิญความเครียดในบางเรื่อง อุ่นใจขอเป็นกำลังใจให้นะคะ";
+    }else{
+        message = "🧡 สุขภาพจิตของคุณควรได้รับการดูแล ลองพูดคุยกับคนที่ไว้ใจ หรือครูแนะแนว อุ่นใจขอส่งกำลังใจให้ผ่านไปได้ด้วยดีนะคะ";
+    }
+
+    const result = document.getElementById("result");
+    result.style.display="block";
+    result.innerHTML = `<h3>ผลคะแนนรวม: ${total} / 150</h3><p>${message}</p>`;
+}
+</script>
+
+</body>
+</html>
